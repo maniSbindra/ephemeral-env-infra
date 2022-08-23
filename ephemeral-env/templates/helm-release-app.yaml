@@ -1,0 +1,80 @@
+apiVersion: helm.crossplane.io/v1beta1
+kind: Release
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "10"
+  name: apphelmpr{{ .Values.prNumber }}
+  # namespace: envpr{{ .Values.prNumber }}ns
+spec:
+# rollbackLimit: 3
+  forProvider:
+    chart:
+      name: helm/app
+      repository: "oci://ghcr.io/manisbindra"
+      version: 0.0.{{ .Values.prNumber }}
+      pullSecretRef:
+        name: helmoci
+        namespace: crossplane-system
+      url: "oci://ghcr.io/manisbindra/helm/app:0.0.{{ .Values.prNumber }}"
+    namespace: app
+#   insecureSkipTLSVerify: true
+#   skipCreateNamespace: true
+#   wait: true
+#   skipCRDs: true
+    values:
+      service:
+        type: LoadBalancer
+      image:
+        tag:  pull-{{ .Values.prSHA}}
+      db:
+        SPRING_DATASOURCE_URL: jdbc:postgresql://pgpr{{ .Values.prNumber }}.postgres.database.azure.com:5432/postgres
+        SPRING_DATASOURCE_USERNAME: psqladminun@pgpr{{ .Values.prNumber }}
+    set:
+    # - name: image.tag
+    #   value: pull-{{ .Values.prSHA}}
+    # - name: prNumber
+    #   value: pr{{ .Values.prNumber }}
+    - name: db.SPRING_DATASOURCE_PASSWORD
+      valueFrom:
+        secretKeyRef:
+          key: password
+          name: psql-password 
+          namespace: crossplane-system
+          # optional: false
+        # value: value2
+#   valuesFrom:
+#     - configMapKeyRef:
+#         key: values.yaml
+#         name: default-vals
+#         namespace: wordpress
+#         optional: false
+#     - secretKeyRef:
+#         key: svalues.yaml
+#         name: svals
+#         namespace: wordpress
+#         optional: false
+#  connectionDetails:
+#    - apiVersion: v1
+#      kind: Service
+#      name: wordpress-example
+#      namespace: wordpress
+#      fieldPath: spec.clusterIP
+#      #fieldPath: status.loadBalancer.ingress[0].ip
+#      toConnectionSecretKey: ip
+#    - apiVersion: v1
+#      kind: Service
+#      name: wordpress-example
+#      namespace: wordpress
+#      fieldPath: spec.ports[0].port
+#      toConnectionSecretKey: port
+#    - apiVersion: v1
+#      kind: Secret
+#      name: wordpress-example
+#      namespace: wordpress
+#      fieldPath: data.wordpress-password
+#      toConnectionSecretKey: password
+#  writeConnectionSecretToRef:
+#    name: wordpress-credentials
+#    namespace: crossplane-system
+  providerConfigRef:
+    name: helmproviderpr{{ .Values.prNumber }}

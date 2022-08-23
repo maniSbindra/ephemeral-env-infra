@@ -1,0 +1,29 @@
+apiVersion: containerservice.azure.jet.crossplane.io/v1alpha2
+kind: KubernetesCluster
+metadata:
+  name: akspr{{ .Values.prNumber }}
+  # namespace: envpr{{ .Values.prNumber }}ns
+spec:
+  writeConnectionSecretToRef:
+    name: fmreal-kubeconfig
+    namespace: envpr{{ .Values.prNumber }}ns
+  forProvider:
+    location: "East US"
+    kubernetesVersion: "1.23.5"
+    resourceGroupNameRef:
+      name: envpr{{ .Values.prNumber }}rg
+      # namespace: {{ .Values.providerNamespace }}
+
+    dnsPrefix: env{{ .Values.prSHA | substr 0 7 | lower }}
+    defaultNodePool:
+      - name: default
+        nodeCount: 1
+        vmSize: "Standard_B2s"
+    identity:
+      - type: "SystemAssigned"
+    tags:
+      purpose: ephemeral-poc
+      prSHA: {{ .Values.prSHA }} 
+  providerConfigRef:
+    name: azjetpr{{ .Values.prNumber }}
+    # namespace: {{ .Values.providerNamespace }}

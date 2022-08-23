@@ -1,0 +1,28 @@
+apiVersion: dbforpostgresql.azure.jet.crossplane.io/v1alpha2
+kind: Server
+metadata:
+  name: pgpr{{ .Values.prNumber }}
+  # namespace: envpr{{ .Values.prNumber }}ns
+spec:
+  forProvider:
+    resourceGroupNameRef:
+      name: envpr{{ .Values.prNumber }}rg
+      # namespace: {{ .Values.providerNamespace }}
+    location: "East US"
+    administratorLogin: "psqladminun"
+    administratorLoginPasswordSecretRef:
+      name: psql-password
+      namespace: crossplane-system
+      key: password
+    skuName: "GP_Gen5_2"
+    version: "11"
+    storageMb: 20480
+    publicNetworkAccessEnabled: true
+    sslEnforcementEnabled: true
+    sslMinimalTlsVersionEnforced: "TLSEnforcementDisabled"
+  providerConfigRef:
+    name: azjetpr{{ .Values.prNumber }}
+    # namespace: {{ .Values.providerNamespace }}
+  writeConnectionSecretToRef:
+    name: postgresqlserver-constr
+    namespace: envpr{{ .Values.prNumber }}ns

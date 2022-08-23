@@ -1,0 +1,17 @@
+apiVersion: dbforpostgresql.azure.jet.crossplane.io/v1alpha2
+kind: FirewallRule
+metadata:
+  name: pgwfrpr{{ .Values.prNumber }}
+  # namespace: envpr{{ .Values.prNumber }}ns
+spec:
+  forProvider:
+    resourceGroupNameRef:
+      name: envpr{{ .Values.prNumber }}rg
+      # namespace: {{ .Values.providerNamespace }}
+    serverNameRef:
+      name: pgpr{{ .Values.prNumber }}
+    startIpAddress: 0.0.0.0
+    endIpAddress: 255.255.255.255
+  providerConfigRef:
+    name: azjetpr{{ .Values.prNumber }}
+    # namespace: {{ .Values.providerNamespace }}

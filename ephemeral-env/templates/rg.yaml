@@ -1,0 +1,15 @@
+apiVersion: azure.jet.crossplane.io/v1alpha2
+kind: ResourceGroup
+metadata:
+  annotations:
+    argocd.argoproj.io/sync-wave: "-2"
+  name: envpr{{ .Values.prNumber }}rg
+  # namespace: envpr{{ .Values.prNumber }}ns
+spec:
+  forProvider:
+    location: "East US"
+    tags:
+      provisioner: crossplane
+      why: forTestingComplex
+  providerConfigRef:
+    name: azjetpr{{ .Values.prNumber }}
