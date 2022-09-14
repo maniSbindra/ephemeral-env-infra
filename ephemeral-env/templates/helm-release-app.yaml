@@ -22,6 +22,7 @@ spec:
 #   wait: true
 #   skipCRDs: true
     values:
+      prNumber: {{ .Values.prNumber }}
       service:
         type: LoadBalancer
       image:
